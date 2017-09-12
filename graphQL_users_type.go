@@ -1,17 +1,18 @@
-package ethereal
+package base
 
 import (
-	"github.com/ethereal-go/ethereal/utils"
-	"github.com/graphql-go/graphql"
-	"golang.org/x/crypto/bcrypt"
-	"strconv"
-	"github.com/ethereal-go/ethereal/root/app"
+	"github.com/ethereal-go/base/root/database"
 	"github.com/ethereal-go/ethereal"
+	"github.com/ethereal-go/ethereal/utils"
+	"github.com/ethereal-go/ethereal/root/app"
+	"github.com/graphql-go/graphql"
+	"strconv"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var (
 	locale = ethereal.GetCnf("L18N.LOCALE").(string)
-	i18n = ethereal.ConstructorI18N()
+	i18n   = ethereal.ConstructorI18N()
 )
 
 /**
@@ -46,7 +47,7 @@ var usersType = graphql.NewObject(graphql.ObjectConfig{
 /**
 / Create User
 */
-var createUser = graphql.Field{
+var CreateUser = graphql.Field{
 	Type:        usersType,
 	Description: "Create new user",
 	Args: graphql.FieldConfigArgument{
@@ -64,6 +65,8 @@ var createUser = graphql.Field{
 		},
 	},
 	Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+		db := params.Context.Value("*Application").(*app.Application).Db
+
 		email, _ := params.Args["email"].(string)
 		name, _ := params.Args["name"].(string)
 		password, _ := params.Args["password"].(string)
@@ -74,8 +77,8 @@ var createUser = graphql.Field{
 			panic(`Error hash password create User service.`)
 		}
 
-		var user = User{Email: email, Name: name, Password: string(hashedPassword), RoleID: role}
-		App.Db.Create(&user)
+		var user = database.User{Email: email, Name: name, Password: string(hashedPassword), RoleID: role}
+		db.Create(&user)
 
 		return user, nil
 	},
@@ -95,30 +98,31 @@ var UserField = graphql.Field{
 		//jwtAuth := params.Context.Value("middlewareJWTToken").(middlewareJWTToken)
 		//
 		//if jwtAuth.included == false || jwtAuth.authenticated {
+
 		db := params.Context.Value("*Application").(*app.Application).Db
-			var users []*User
+		var users []*database.User
 		db.Find(&users)
 
-			idQuery, isOK := params.Args["id"].(string)
+		idQuery, isOK := params.Args["id"].(string)
 
-			if isOK {
-				for _, user := range users {
-					if strconv.Itoa(int(user.ID)) == idQuery {
-						var role Role
-						db.Model(&user).Related(&role)
-						user.Role = role
-						return []User{*user}, nil
-					}
+		if isOK {
+			for _, user := range users {
+				if strconv.Itoa(int(user.ID)) == idQuery {
+
+					var role database.Role
+					db.Model(&user).Related(&role)
+					user.Role = role
+					return []database.User{*user}, nil
 				}
 			}
+		}
 
-			for _, user := range users {
-				var role Role
-				db.Model(&user).Related(&role)
-				user.Role = role
-			}
-
-			return users, nil
+		//for _, user := range users {
+		//	var role Role
+		//	db.Model(&user).Related(&role)
+		//	user.Role = role
+		//}
+		return users, nil
 		//}
 		//jwtAuth.responseWriter.WriteHeader(jwtAuth.statusError)
 		//json.NewEncoder(jwtAuth.responseWriter).Encode(http.StatusText(jwtAuth.statusError))

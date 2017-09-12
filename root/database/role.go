@@ -1,0 +1,22 @@
+package database
+
+import (
+	"time"
+)
+
+type RoleService interface {
+	Role(id int) (*Role, error)
+	Roles() ([]*Role, error)
+	CreateRole(u *Role) error
+	DeleteRole(id int) error
+}
+
+type Role struct {
+	ID          uint   `json:"id";gorm:"primary_key"`
+	Name        string `json:"name"`
+	DisplayName string `json:"display_name"`
+	Description string `json:"password"`
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	DeletedAt   *time.Time `sql:"index"`
+}
