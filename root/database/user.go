@@ -1,16 +1,8 @@
 package database
 
 import (
-	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"time"
 )
-
-type UserService interface {
-	User(id int) (*User, error)
-	Users() ([]*User, error)
-	CreateUser(u *User) error
-	DeleteUser(id int) error
-}
 
 type User struct {
 	ID        uint   `json:"id";gorm:"primary_key"`
