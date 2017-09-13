@@ -8,10 +8,12 @@ import (
 	"github.com/graphql-go/graphql"
 	"strconv"
 	"golang.org/x/crypto/bcrypt"
+	"github.com/ethereal-go/ethereal/root/config"
+
 )
 
 var (
-	locale = ethereal.GetCnf("L18N.LOCALE").(string)
+	locale = config.GetCnf("L18N.LOCALE").(string)
 	i18n   = ethereal.ConstructorI18N()
 )
 
