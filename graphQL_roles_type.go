@@ -9,6 +9,7 @@ import (
 
 var roleType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Role",
+	Description:string(i18n.T(locale, "graphQL.RoleType.Description")),
 	Fields: graphql.Fields{
 		"id": &graphql.Field{
 			Type:        graphql.ID,

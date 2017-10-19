@@ -22,6 +22,7 @@ var (
 */
 var usersType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "User",
+	Description:string(i18n.T(locale, "graphQL.UserType.Description")),
 	Fields: graphql.Fields{
 		"id": &graphql.Field{
 			Type:        graphql.String,
